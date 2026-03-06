@@ -181,3 +181,27 @@ class OcrolusClient:
             headers=self._headers(org_name),
         )
         return resp.json() if resp.content else {}
+
+    def upload_mixed_document(
+        self,
+        book_uuid: str,
+        filename: str,
+        fileobj: BinaryIO,
+        org_name: str,
+    ) -> dict[str, Any]:
+        """
+        POST /v1/book/upload/mixed multipart: file + book_uuid.
+        Used for uploading mixed document types to a single book.
+        """
+        url = f"{self.api_base}/v1/book/upload/mixed"
+        fileobj.seek(0)
+        files = {"file": (filename, fileobj)}
+        data = {"book_uuid": book_uuid}
+        resp = request_with_retry(
+            "POST",
+            url,
+            data=data,
+            files=files,
+            headers=self._headers(org_name),
+        )
+        return resp.json() if resp.content else {}

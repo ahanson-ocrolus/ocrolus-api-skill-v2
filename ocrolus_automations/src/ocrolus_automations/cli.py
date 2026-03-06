@@ -1,4 +1,4 @@
-"""Typer CLI: move-book, list-automations, book-status (test single API)."""
+"""Typer CLI: automations + credential management."""
 
 from __future__ import annotations
 
@@ -7,10 +7,17 @@ from typing import Optional
 
 import typer
 
+from ocrolus_automations.automations.bulk_upload import run_bulk_upload
 from ocrolus_automations.automations.move_book import run_move_book
 from ocrolus_automations.clients.ocrolus_client import OcrolusClient
 from ocrolus_automations.config import get_settings
 from ocrolus_automations.log_config import setup_logging
+from ocrolus_automations.utils.env_store import (
+    ENV_FILE,
+    add_org as env_add_org,
+    parse_org_names,
+    remove_org as env_remove_org,
+)
 
 app = typer.Typer(
     name="ocrolus-auto",
@@ -45,18 +52,108 @@ def move_book(
     raise typer.Exit(exit_code)
 
 
+@app.command("bulk-upload")
+def bulk_upload(
+    input_dir: str = typer.Option(
+        ...,
+        "--input-dir",
+        help="Path to directory containing book folders (each subfolder = one book)",
+    ),
+    org: str = typer.Option(
+        "org1",
+        "--org",
+        help="Org name (config key for credentials)",
+    ),
+    dry_run: bool = typer.Option(
+        False,
+        "--dry-run",
+        help="Print what would happen without creating books or uploading files",
+    ),
+) -> None:
+    """Bulk-upload: create books from local folders and upload documents via /v1/book/upload/mixed."""
+    _ensure_logging()
+    exit_code = run_bulk_upload(
+        input_dirs=[input_dir],
+        org=org,
+        dry_run=dry_run,
+    )
+    raise typer.Exit(exit_code)
+
+
 @app.command("list-automations")
 def list_automations() -> None:
     """Show available automations."""
     _ensure_logging()
     typer.echo("Available automations:")
+    typer.echo("  bulk-upload Bulk-create books from local folders and upload documents")
     typer.echo("  move-book   Copy a book from one org to another (new book in target org)")
     typer.echo("  book-status Call GET /v1/book/status for a book (test single API)")
     typer.echo("")
+    typer.echo("Credential management:")
+    typer.echo("  add-org     Add org credentials to .env")
+    typer.echo("  list-orgs   List configured orgs")
+    typer.echo("  remove-org  Remove an org from .env")
+    typer.echo("")
     typer.echo("Usage examples:")
+    typer.echo("  ocrolus-auto bulk-upload --input-dir /path/to/books --org bulk_upload_test [--dry-run]")
     typer.echo("  ocrolus-auto move-book --source-book-uuid <uuid> --target-book-name \"My Book\" [--dry-run]")
     typer.echo("  ocrolus-auto book-status --book-uuid <uuid> --org org1")
-    typer.echo("  python -m ocrolus_automations move-book --source-book-uuid <uuid> --target-book-name \"My Book\"")
+
+
+# ---------------------------------------------------------------------------
+# Credential management
+# ---------------------------------------------------------------------------
+
+
+@app.command("add-org")
+def add_org(
+    name: str = typer.Option(..., "--name", prompt="Org name (e.g. my_org)", help="Org name identifier"),
+    client_id: str = typer.Option(..., "--client-id", prompt="Client ID", help="OAuth2 client ID"),
+    client_secret: str = typer.Option(
+        ..., "--client-secret", prompt="Client Secret", hide_input=True, help="OAuth2 client secret"
+    ),
+) -> None:
+    """Add org credentials to .env file."""
+    existing = parse_org_names()
+    if name.lower() in existing:
+        overwrite = typer.confirm(f"Org '{name}' already exists. Overwrite?", default=False)
+        if not overwrite:
+            typer.echo("Aborted.")
+            raise typer.Exit(0)
+
+    env_add_org(name, client_id, client_secret)
+    typer.echo(f"Saved credentials for org '{name}' to {ENV_FILE}")
+
+
+@app.command("list-orgs")
+def list_orgs() -> None:
+    """List configured org names from .env."""
+    orgs = parse_org_names()
+    if not orgs:
+        typer.echo("No orgs configured. Use 'ocrolus-auto add-org' to add one.")
+        return
+    typer.echo("Configured orgs:")
+    for org in orgs:
+        typer.echo(f"  {org}")
+
+
+@app.command("remove-org")
+def remove_org(
+    name: str = typer.Option(..., "--name", prompt="Org name to remove", help="Org name to remove"),
+) -> None:
+    """Remove an org's credentials from .env."""
+    existing = parse_org_names()
+    if name.lower() not in existing:
+        typer.echo(f"Org '{name}' not found.")
+        raise typer.Exit(1)
+
+    confirm = typer.confirm(f"Remove credentials for org '{name}'?", default=False)
+    if not confirm:
+        typer.echo("Aborted.")
+        raise typer.Exit(0)
+
+    env_remove_org(name)
+    typer.echo(f"Removed org '{name}' from {ENV_FILE}")
 
 
 @app.command("book-status")
