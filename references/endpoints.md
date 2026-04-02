@@ -207,6 +207,28 @@ See `references/webhooks.md` for complete webhook documentation.
 
 ---
 
+## Optima -- Real-Time Extraction (separate host)
+
+> **Note:** These endpoints use a different base URL (`apika.ocrolus.com`) and are not linked
+> from the main Ocrolus docs navigation. They were discovered via direct URL:
+> [optima-capture](https://docs.ocrolus.com/reference/optima-capture),
+> [optima-capture-images](https://docs.ocrolus.com/reference/optima-capture-images).
+
+| Operation | Method | Path | Content-Type |
+|-----------|--------|------|-------------|
+| Classify + Capture (PDF) | POST | `https://apika.ocrolus.com/ml/v2/instant` | `application/pdf` |
+| Classify + Capture (Images) | POST | `https://apika.ocrolus.com/ml/v2/instant/images` | `multipart/form-data` |
+
+**How Optima differs from the standard pipeline:**
+- **No book required** — documents are not stored; results returned immediately
+- **No human verification** — pure ML extraction
+- **Same auth** — uses the same OAuth Bearer token from `auth.ocrolus.com`
+- **Use case:** Quick validation (confirm doc type, check if a field is present) rather than full processing
+
+**Validated:** 2026-03-31 — both endpoints return `415` (correct content-type required), confirming routes are live and authenticated.
+
+---
+
 ## Endpoint Count Summary
 
 | Category | Count |
@@ -223,4 +245,5 @@ See `references/webhooks.md` for complete webhook documentation.
 | Encore / Book Copy | 6 |
 | Webhooks (Org-Level) | 8 |
 | Webhooks (Account-Level) | 4 |
-| **TOTAL** | **75** |
+| Optima (Real-Time) | 2 |
+| **TOTAL** | **77** |

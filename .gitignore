@@ -4,6 +4,9 @@ ocrolus_automations/
 # Internal testing findings
 tools/FINDINGS.md
 
+# Skill evals (internal testing)
+evals/
+
 # Reports (generated)
 reports/
 
