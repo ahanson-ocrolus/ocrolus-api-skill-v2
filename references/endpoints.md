@@ -92,6 +92,7 @@
 | Form Field Data | GET | `/v1/form/{form_uuid}/fields` |
 | Pay Stub Data | GET | `/v1/paystub/{paystub_uuid}` |
 | Transactions | GET | `/v1/book/{book_pk}/transactions` | # NEEDS LIVE VALIDATION -- verify path param vs query param style |
+| Document Periods | GET | `/v1/document/periods?pk={pk}` | UNDOCUMENTED — not in official docs or OpenAPI spec; likely legacy |
 
 **Features:**
 - Confidence scores per field (0 = no confidence, 1 = very high)
@@ -237,7 +238,7 @@ See `references/webhooks.md` for complete webhook documentation.
 | Book Operations | 8 |
 | Document Upload & Management | 13 |
 | Classification (Classify) | 3 |
-| Data Extraction (Capture) | 7 |
+| Data Extraction (Capture) | 8 |
 | Fraud Detection (Detect) | 4 |
 | Cash Flow Analytics | 6 |
 | Income Calculations | 7 |
@@ -246,4 +247,4 @@ See `references/webhooks.md` for complete webhook documentation.
 | Webhooks (Org-Level) | 8 |
 | Webhooks (Account-Level) | 4 |
 | Optima (Real-Time) | 2 |
-| **TOTAL** | **77** |
+| **TOTAL** | **78** |
