@@ -1,8 +1,14 @@
+# macOS
+.DS_Store
+
 # Separate repo (private)
 ocrolus_automations/
 
 # Internal testing findings
 tools/FINDINGS.md
+
+# Skill evals (internal testing)
+evals/
 
 # Reports (generated)
 reports/
