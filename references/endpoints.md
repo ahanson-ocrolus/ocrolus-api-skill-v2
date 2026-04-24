@@ -26,27 +26,42 @@
 
 ---
 
-## Book Operations (v1, uses `pk` integer)
+## Book Commands
+
+Write operations on Books: create, update, delete.
 
 | Endpoint | Method | Path | Input | Status |
 |----------|--------|------|-------|--------|
 | `book/add` | POST | `/v1/book/add` | **Body (JSON):** `name`, `book_type` | CORRECTED — `/v1/book/create` returns 404 |
 | `book/delete` | POST | `/v1/book/delete` | **Body (JSON):** `book_id` (integer) OR `book_uuid` (UUID) | CONFIRMED |
 | `book/update` | POST | `/v1/book/update` | **Body (JSON):** `pk` (integer) OR `book_uuid` (UUID), + `name` | CONFIRMED |
+
+**Important corrections:**
+- The add endpoint is `/v1/book/add` (NOT `/v1/book/create`). Returns `pk`, `uuid`, `book_type`.
+- **Field names vary by endpoint** — delete uses `book_id`, update uses `pk`. Always check the specific endpoint.
+
+---
+
+## Book Queries
+
+Read operations on Books: get info, list, status, and related loans.
+
+| Endpoint | Method | Path | Input | Status |
+|----------|--------|------|-------|--------|
 | `book/{pk}` | GET | `/v1/book/{pk}` | **Path:** `pk` (integer) | CONFIRMED |
 | `books` | GET | `/v1/books` | **Query (optional):** `page`, `per_page` | CONFIRMED |
 | `book/status` | GET | `/v1/book/status?book_pk={pk}` | **Query:** `book_pk` (integer) | CONFIRMED — path-param `/v1/book/{pk}/status` also works |
 | `book/loan/{loan_id}` | GET | `/v1/book/loan/{loan_id}` | **Path:** `loan_id` (string) | CONFIRMED |
 | `book/{pk}/loan` | GET | `/v1/book/{pk}/loan` | **Path:** `pk` (integer) | CONFIRMED |
 
-**Important corrections:**
-- The add endpoint is `/v1/book/add` (NOT `/v1/book/create`). Returns `pk`, `uuid`, `book_type`.
-- **Field names vary by endpoint** — delete uses `book_id`, update uses `pk`, uploads use `pk`. Always check the specific endpoint.
+**Notes:**
 - Both Book Status styles work: query param (`?book_pk=X`) and path param (`/{pk}/status`).
 
 ---
 
-## Document Upload & Management (v1)
+## File Uploads
+
+Upload documents, paystubs, images, and Plaid data to Books.
 
 | Endpoint | Method | Path | Input | Notes |
 |----------|--------|------|-------|-------|
@@ -57,30 +72,47 @@
 | `book/finalize-image-group` | POST | `/v1/book/finalize-image-group` | **Body (JSON):** `pk` (integer) OR `book_uuid` (UUID), `image_group` (string) | |
 | `book/upload/plaid` | POST | `/v1/book/upload/plaid` | **Body (JSON):** `pk` (integer) OR `book_uuid` (UUID) | |
 | `book/import/plaid/asset` | POST | `/v1/book/import/plaid/asset` | **Body (JSON):** `audit_copy_token` (string) | Production only; `auditor_id: "ocrolus"` |
-| `document/cancel` | POST | `/v1/document/{doc_uuid}/cancel` | **Path:** `doc_uuid` (UUID); **Body (JSON, optional):** `doc_pk` (integer) OR `doc_uuid` (UUID), `accept_charges` (boolean) | Also: `/v1/document/cancel?doc_uuid=X` |
-| `document/remove` | POST | `/v1/document/{doc_uuid}/delete` | **Path:** `doc_uuid` (UUID); **Body (JSON):** `doc_id` (integer) OR `doc_uuid` (UUID) | Also: `/v1/document/remove?doc_uuid=X` |
-| `document/{doc_uuid}/download` | GET | `/v1/document/{doc_uuid}/download` | **Path:** `doc_uuid` (UUID) | Returns binary |
-| `document/upgrade` | POST | `/v1/document/{doc_uuid}/upgrade` | **Path:** `doc_uuid` (UUID); **Body (JSON):** `doc_pk` (integer) OR `doc_uuid` (UUID), `upgrade_type` (string) | Also: `/v1/document/upgrade?doc_uuid=X` |
-| `document/mixed/upgrade` | POST | `/v1/document/mixed/upgrade` | **Body (JSON):** `mixed_doc_pk` (integer) OR `mixed_doc_uuid` (UUID), `upgrade_type` (string) | |
-| `document/mixed/status` | GET | `/v1/document/mixed/status` | **Query:** one of `pk` (integer), `doc_uuid` (UUID), or `mixed_doc_uuid` (UUID) | |
 
 **Upload notes:**
 - PDF upload path is `/v1/book/upload` (with `pk` or `book_uuid` in form data), NOT `/v1/book/{pk}/upload/pdf`
 - The form field is `pk` (integer) or `book_uuid` (UUID) — NOT `book_pk`
 - Max file size: **200 MB**
 - `form_type` is optional; cannot be used for bank statements
-- Plaid Asset Import uses audit copy token (production only; `auditor_id: "ocrolus"`)
-
-**Field name inconsistencies (per official spec):**
-- Delete uses `book_id` (not `book_pk` or `pk`)
-- Document cancel/upgrade use `doc_pk` (not `doc_id`)
-- Document remove (delete) uses `doc_id` (not `doc_pk`)
-- Mixed document upgrade uses `mixed_doc_pk` (not `mixed_doc_id`)
-- Transactions use `book_pk` and `uploaded_doc_pk` in query params
 
 ---
 
-## Document Classification -- Classify (v2, uses `book_uuid`)
+## File Commands
+
+Write operations on files: cancel, delete, download, upgrade.
+
+| Endpoint | Method | Path | Input | Notes |
+|----------|--------|------|-------|-------|
+| `document/cancel` | POST | `/v1/document/{doc_uuid}/cancel` | **Path:** `doc_uuid` (UUID); **Body (JSON, optional):** `doc_pk` (integer) OR `doc_uuid` (UUID), `accept_charges` (boolean) | Also: `/v1/document/cancel?doc_uuid=X` |
+| `document/remove` | POST | `/v1/document/{doc_uuid}/delete` | **Path:** `doc_uuid` (UUID); **Body (JSON):** `doc_id` (integer) OR `doc_uuid` (UUID) | Also: `/v1/document/remove?doc_uuid=X` |
+| `document/{doc_uuid}/download` | GET | `/v1/document/{doc_uuid}/download` | **Path:** `doc_uuid` (UUID) | Returns binary |
+| `document/upgrade` | POST | `/v1/document/{doc_uuid}/upgrade` | **Path:** `doc_uuid` (UUID); **Body (JSON):** `doc_pk` (integer) OR `doc_uuid` (UUID), `upgrade_type` (string) | Also: `/v1/document/upgrade?doc_uuid=X` |
+| `document/mixed/upgrade` | POST | `/v1/document/mixed/upgrade` | **Body (JSON):** `mixed_doc_pk` (integer) OR `mixed_doc_uuid` (UUID), `upgrade_type` (string) | |
+
+**Field name inconsistencies (per official spec):**
+- Document cancel/upgrade use `doc_pk` (not `doc_id`)
+- Document remove (delete) uses `doc_id` (not `doc_pk`)
+- Mixed document upgrade uses `mixed_doc_pk` (not `mixed_doc_id`)
+
+---
+
+## File Queries
+
+Read operations on files.
+
+| Endpoint | Method | Path | Input |
+|----------|--------|------|-------|
+| `document/mixed/status` | GET | `/v1/document/mixed/status` | **Query:** one of `pk` (integer), `doc_uuid` (UUID), or `mixed_doc_uuid` (UUID) |
+
+---
+
+## Classify
+
+Identify document types with confidence scores. Uses `book_uuid`.
 
 | Endpoint | Method | Path | Input |
 |----------|--------|------|-------|
@@ -96,7 +128,9 @@
 
 ---
 
-## Data Extraction -- Capture (v1, uses `pk`)
+## Capture
+
+Extract structured data from documents (forms, paystubs, transactions). Uses `pk`.
 
 | Endpoint | Method | Path | Input |
 |----------|--------|------|-------|
@@ -117,7 +151,9 @@
 
 ---
 
-## Fraud Detection -- Detect (v2, uses `book_uuid`)
+## Detect
+
+Fraud detection signals, authenticity scores, and reason codes. Uses `book_uuid`.
 
 | Endpoint | Method | Path | Input |
 |----------|--------|------|-------|
@@ -132,7 +168,9 @@ See `references/detect.md` for full Detect coverage including authenticity score
 
 ---
 
-## Financial Analysis -- Analyze (v2, uses `book_uuid`)
+## Analyze
+
+Cash flow analytics, enriched transactions, and risk scoring. Uses `book_uuid`.
 
 ### Cash Flow Analytics
 
@@ -153,6 +191,12 @@ See `references/detect.md` for full Detect coverage including authenticity score
 **`cash_flow_features` query params:**
 - `min_days_to_include` (optional, default 0): minimum days for most recent month; set to 32 for full months only
 
+---
+
+## Income
+
+Income calculations, BSIC, and self-employed income. Uses `book_uuid`.
+
 ### Income Calculations
 
 | Endpoint | Method | Path | Input |
@@ -167,7 +211,9 @@ See `references/detect.md` for full Detect coverage including authenticity score
 
 ---
 
-## Tag Management (v2, Beta)
+## Tag Management
+
+Transaction tag management (Beta).
 
 | Endpoint | Method | Path | Input |
 |----------|--------|------|-------|
@@ -182,7 +228,9 @@ See `references/detect.md` for full Detect coverage including authenticity score
 
 ---
 
-## Encore / Book Copy (v1)
+## Encore
+
+Book copy jobs for organization-to-organization sharing.
 
 | Endpoint | Method | Path | Input |
 |----------|--------|------|-------|
@@ -250,17 +298,20 @@ See `references/webhooks.md` for complete webhook documentation.
 | Category | Count |
 |----------|-------|
 | Authentication | 1 |
-| Book Operations | 8 |
-| Document Upload & Management | 13 |
-| Classification (Classify) | 3 |
-| Data Extraction (Capture) | 8 |
-| Fraud Detection (Detect) | 4 |
-| Cash Flow Analytics | 6 |
-| Income Calculations | 7 |
+| Book Commands | 3 |
+| Book Queries | 5 |
+| File Uploads | 7 |
+| File Commands | 5 |
+| File Queries | 1 |
+| Classify | 3 |
+| Capture | 8 |
+| Detect | 4 |
+| Analyze (Cash Flow) | 6 |
+| Income | 7 |
 | Tag Management | 8 |
-| Encore / Book Copy | 6 |
-| Webhooks (Org-Level) | 8 |
-| Webhooks (Account-Level) | 4 |
+| Encore | 6 |
+| Webhooks (Account Level) | 4 |
+| Webhooks (Org Level) | 8 |
 | Optima (Real-Time) | 2 |
 | **TOTAL** | **78** |
 

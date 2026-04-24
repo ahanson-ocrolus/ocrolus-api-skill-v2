@@ -37,113 +37,116 @@ ENDPOINTS = [
      "json", False,
      "Body: form-encoded (NOT JSON). OAuth 2.0 client_credentials grant. Returns JWT with 24h expiry. No 'audience' param."),
 
-    # ── Book Operations ──
-    ("Book Operations", "bookAdd", "book/add — Add a new Book",
+    # ── Book Commands (write operations) ──
+    ("Book Commands", "bookAdd", "book/add — Create a new Book",
      "POST", "/v1/book/add", [],
      {"name": "string", "book_type": "string"},
      "json", False, "CORRECTED from /v1/book/create. Returns pk (int) and uuid (str). Body: JSON."),
 
-    ("Book Operations", "bookDelete", "book/delete — Delete a Book",
+    ("Book Commands", "bookDelete", "book/delete — Delete a Book",
      "POST", "/v1/book/delete", [],
      {"book_id": "integer", "book_uuid": "string"},
      "json", False, "Body: JSON. Exactly one of book_id (integer) or book_uuid (UUID string)."),
 
-    ("Book Operations", "bookUpdate", "book/update — Update Book properties",
+    ("Book Commands", "bookUpdate", "book/update — Update Book properties",
      "POST", "/v1/book/update", [],
      {"pk": "integer", "book_uuid": "string", "name": "string"},
      "json", False, "Body: JSON. Provide pk (integer) or book_uuid (UUID string) + fields to update."),
 
-    ("Book Operations", "bookInfo", "book/{pk} — Get Book information",
+    # ── Book Queries (read operations) ──
+    ("Book Queries", "bookInfo", "book/{pk} — Get Book information",
      "GET", "/v1/book/{pk}",
      [{"name": "pk", "in": "path", "type": "integer", "required": True, "description": "Book primary key (integer)"}],
      None, "json", False, "Path param: pk (integer)."),
 
-    ("Book Operations", "booksList", "books — List all Books",
+    ("Book Queries", "booksList", "books — List all Books",
      "GET", "/v1/books",
      [{"name": "page", "in": "query", "type": "integer", "required": False, "description": "Page number"},
       {"name": "per_page", "in": "query", "type": "integer", "required": False, "description": "Results per page"}],
      None, "json", False, "Query params: page, per_page (both optional)."),
 
-    ("Book Operations", "bookStatus", "book/status — Get Book processing status",
+    ("Book Queries", "bookStatus", "book/status — Get Book processing status",
      "GET", "/v1/book/status",
      [{"name": "book_pk", "in": "query", "type": "integer", "required": True, "description": "Book primary key"}],
      None, "json", False,
      "Query param: book_pk (integer). Alt path: /v1/book/{pk}/status also works."),
 
-    ("Book Operations", "bookFromLoan", "book/loan/{loan_id} — Get Book from loan",
+    ("Book Queries", "bookFromLoan", "book/loan/{loan_id} — Get Book from loan",
      "GET", "/v1/book/loan/{loan_id}",
      [{"name": "loan_id", "in": "path", "type": "string", "required": True, "description": "Loan identifier"}],
      None, "json", False, "Path param: loan_id (string)."),
 
-    ("Book Operations", "bookLoan", "book/{pk}/loan — Get loan from Book",
+    ("Book Queries", "bookLoan", "book/{pk}/loan — Get loan from Book",
      "GET", "/v1/book/{pk}/loan",
      [{"name": "pk", "in": "path", "type": "integer", "required": True, "description": "Book primary key (integer)"}],
      None, "json", False, "Path param: pk (integer)."),
 
-    # ── Document Upload & Management ──
-    ("Document Upload", "bookUpload", "book/upload — Upload a PDF document",
+    # ── File Uploads ──
+    ("File Uploads", "bookUpload", "book/upload — Upload a PDF document",
      "POST", "/v1/book/upload", [],
      {"_multipart": True, "pk": "integer", "book_uuid": "string", "upload": "file", "form_type": "string", "doc_name": "string"},
      "json", False, "Form: multipart/form-data. Provide pk (integer) or book_uuid (UUID). Max 200MB. form_type and doc_name optional."),
 
-    ("Document Upload", "bookUploadMixed", "book/upload/mixed — Upload a mixed document PDF",
+    ("File Uploads", "bookUploadMixed", "book/upload/mixed — Upload a mixed document PDF",
      "POST", "/v1/book/upload/mixed", [],
      {"_multipart": True, "pk": "integer", "book_uuid": "string", "upload": "file"},
      "json", False, "Form: multipart/form-data. Provide pk (integer) or book_uuid (UUID). Multiple doc types in single PDF."),
 
-    ("Document Upload", "bookUploadPaystub", "book/upload/paystub — Upload a pay stub PDF",
+    ("File Uploads", "bookUploadPaystub", "book/upload/paystub — Upload a pay stub PDF",
      "POST", "/v1/book/upload/paystub", [],
      {"_multipart": True, "pk": "integer", "book_uuid": "string", "upload": "file"},
      "json", False, "Form: multipart/form-data. Provide pk (integer) or book_uuid (UUID)."),
 
-    ("Document Upload", "bookUploadImage", "book/upload/image — Upload an image",
+    ("File Uploads", "bookUploadImage", "book/upload/image — Upload an image",
      "POST", "/v1/book/upload/image", [],
      {"_multipart": True, "pk": "integer", "book_uuid": "string", "upload": "file", "image_group": "string"},
      "json", False, "Form: multipart/form-data. Provide pk (integer) or book_uuid (UUID)."),
 
-    ("Document Upload", "bookFinalizeImageGroup", "book/finalize-image-group — Finalize an image group",
+    ("File Uploads", "bookFinalizeImageGroup", "book/finalize-image-group — Finalize an image group",
      "POST", "/v1/book/finalize-image-group", [],
      {"pk": "integer", "book_uuid": "string", "image_group": "string"},
      "json", False, "Body: JSON. Provide pk (integer) or book_uuid (UUID)."),
 
-    ("Document Upload", "bookUploadPlaid", "book/upload/plaid — Upload Plaid aggregator JSON",
+    ("File Uploads", "bookUploadPlaid", "book/upload/plaid — Upload Plaid aggregator JSON",
      "POST", "/v1/book/upload/plaid", [],
      {"pk": "integer", "book_uuid": "string"}, "json", False, "Body: JSON. Provide pk (integer) or book_uuid (UUID)."),
 
-    ("Document Upload", "bookImportPlaidAsset", "book/import/plaid/asset — Import Plaid Asset Report",
+    ("File Uploads", "bookImportPlaidAsset", "book/import/plaid/asset — Import Plaid Asset Report",
      "POST", "/v1/book/import/plaid/asset", [],
      {"audit_copy_token": "string"},
      "json", False, "Body: JSON. Production only. Requires auditor_id: 'ocrolus'."),
 
-    ("Document Upload", "documentCancel", "document/cancel — Cancel document verification",
+    # ── File Commands (write operations on files) ──
+    ("File Commands", "documentCancel", "document/cancel — Cancel document verification",
      "POST", "/v1/document/{doc_uuid}/cancel",
      [{"name": "doc_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Document UUID"}],
      {"doc_pk": "integer", "doc_uuid": "string", "accept_charges": "boolean"},
      "json", False, "Path param: doc_uuid (UUID). Body (JSON, optional): doc_pk or doc_uuid, accept_charges. Official spec also supports query-param style: /v1/document/cancel?doc_uuid=X"),
 
-    ("Document Upload", "documentDelete", "document/remove — Delete a document",
+    ("File Commands", "documentDelete", "document/remove — Delete a document",
      "POST", "/v1/document/{doc_uuid}/delete",
      [{"name": "doc_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Document UUID"}],
      {"doc_id": "integer", "doc_uuid": "string"},
      "json", False, "Path param: doc_uuid (UUID). Body (JSON): doc_id (integer) or doc_uuid (UUID). Official spec also supports query-param style: /v1/document/remove?doc_uuid=X"),
 
-    ("Document Upload", "documentDownload", "document/{doc_uuid}/download — Download a document file",
+    ("File Commands", "documentDownload", "document/{doc_uuid}/download — Download a document file",
      "GET", "/v1/document/{doc_uuid}/download",
      [{"name": "doc_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Document UUID"}],
      None, "binary", False, "Path param: doc_uuid (UUID)."),
 
-    ("Document Upload", "documentUpgrade", "document/upgrade — Upgrade document processing",
+    ("File Commands", "documentUpgrade", "document/upgrade — Upgrade document processing",
      "POST", "/v1/document/{doc_uuid}/upgrade",
      [{"name": "doc_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Document UUID"}],
      {"doc_pk": "integer", "doc_uuid": "string", "upgrade_type": "string"},
      "json", False, "Path param: doc_uuid (UUID). Body (JSON): doc_pk or doc_uuid + upgrade_type. Official spec also supports: /v1/document/upgrade?doc_uuid=X"),
 
-    ("Document Upload", "documentMixedUpgrade", "document/mixed/upgrade — Upgrade mixed document",
+    ("File Commands", "documentMixedUpgrade", "document/mixed/upgrade — Upgrade mixed document",
      "POST", "/v1/document/mixed/upgrade", [],
      {"mixed_doc_pk": "integer", "mixed_doc_uuid": "string", "upgrade_type": "string"},
      "json", False, "Body (JSON): mixed_doc_pk (integer) or mixed_doc_uuid (UUID) + upgrade_type."),
 
-    ("Document Upload", "documentMixedStatus", "document/mixed/status — Get mixed document status",
+    # ── File Queries (read operations on files) ──
+    ("File Queries", "documentMixedStatus", "document/mixed/status — Get mixed document status",
      "GET", "/v1/document/mixed/status",
      [{"name": "pk", "in": "query", "type": "integer", "required": False, "description": "Mixed document primary key"},
       {"name": "doc_uuid", "in": "query", "type": "string", "format": "uuid", "required": False, "description": "Document UUID"},
@@ -151,53 +154,53 @@ ENDPOINTS = [
      None, "json", False, "Query params: exactly one of pk (integer), doc_uuid (UUID), or mixed_doc_uuid (UUID)."),
 
     # ── Classification (v2) ──
-    ("Classification", "bookClassificationSummary", "book/{book_uuid}/classification-summary — Book classification",
+    ("Classify", "bookClassificationSummary", "book/{book_uuid}/classification-summary — Book classification",
      "GET", "/v2/book/{book_uuid}/classification-summary",
      [{"name": "book_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Book UUID"}],
      None, "json", False, "Path param: book_uuid (UUID). Identifies 300+ document types with confidence scores (0-1)."),
 
-    ("Classification", "mixedDocClassificationSummary", "mixed-document/{mixed_doc_uuid}/classification-summary",
+    ("Classify", "mixedDocClassificationSummary", "mixed-document/{mixed_doc_uuid}/classification-summary",
      "GET", "/v2/mixed-document/{mixed_doc_uuid}/classification-summary",
      [{"name": "mixed_doc_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Mixed document UUID"}],
      None, "json", False, "Path param: mixed_doc_uuid (UUID)."),
 
-    ("Classification", "groupedMixedDocSummary", "index/mixed-doc/{mixed_doc_uuid}/summary — Grouped classification",
+    ("Classify", "groupedMixedDocSummary", "index/mixed-doc/{mixed_doc_uuid}/summary — Grouped classification",
      "GET", "/v2/index/mixed-doc/{mixed_doc_uuid}/summary",
      [{"name": "mixed_doc_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Mixed document UUID"}],
      None, "json", False, "Path param: mixed_doc_uuid (UUID). Organizes forms into logical groups with uniqueness values."),
 
     # ── Data Extraction / Capture (v1) ──
-    ("Data Extraction", "bookForms", "book/{pk}/forms — Get book form data",
+    ("Capture", "bookForms", "book/{pk}/forms — Get book form data",
      "GET", "/v1/book/{pk}/forms",
      [{"name": "pk", "in": "path", "type": "integer", "required": True, "description": "Book primary key (integer)"}],
      None, "json", False, "Path param: pk (integer)."),
 
-    ("Data Extraction", "bookPaystubs", "book/{pk}/paystubs — Get book pay stub data",
+    ("Capture", "bookPaystubs", "book/{pk}/paystubs — Get book pay stub data",
      "GET", "/v1/book/{pk}/paystubs",
      [{"name": "pk", "in": "path", "type": "integer", "required": True, "description": "Book primary key (integer)"}],
      None, "json", False, "Path param: pk (integer)."),
 
-    ("Data Extraction", "documentForms", "document/{doc_uuid}/forms — Get document form data",
+    ("Capture", "documentForms", "document/{doc_uuid}/forms — Get document form data",
      "GET", "/v1/document/{doc_uuid}/forms",
      [{"name": "doc_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Document UUID"}],
      None, "json", False, "Path param: doc_uuid (UUID)."),
 
-    ("Data Extraction", "documentPaystubs", "document/{doc_uuid}/paystubs — Get document pay stub data",
+    ("Capture", "documentPaystubs", "document/{doc_uuid}/paystubs — Get document pay stub data",
      "GET", "/v1/document/{doc_uuid}/paystubs",
      [{"name": "doc_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Document UUID"}],
      None, "json", False, "Path param: doc_uuid (UUID)."),
 
-    ("Data Extraction", "formFields", "form/{form_uuid}/fields — Get form field data",
+    ("Capture", "formFields", "form/{form_uuid}/fields — Get form field data",
      "GET", "/v1/form/{form_uuid}/fields",
      [{"name": "form_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Form UUID"}],
      None, "json", False, "Path param: form_uuid (UUID). Returns confidence scores per field (0-1)."),
 
-    ("Data Extraction", "paystubData", "paystub/{paystub_uuid} — Get pay stub data",
+    ("Capture", "paystubData", "paystub/{paystub_uuid} — Get pay stub data",
      "GET", "/v1/paystub/{paystub_uuid}",
      [{"name": "paystub_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Pay stub UUID"}],
      None, "json", False, "Path param: paystub_uuid (UUID)."),
 
-    ("Data Extraction", "bookTransactions", "book/{pk}/transactions — Get book transactions",
+    ("Capture", "bookTransactions", "book/{pk}/transactions — Get book transactions",
      "GET", "/v1/book/{pk}/transactions",
      [{"name": "pk", "in": "path", "type": "integer", "required": True, "description": "Book primary key (integer)"},
       {"name": "uploaded_doc_pk", "in": "query", "type": "integer", "required": False, "description": "Filter by uploaded document primary key"},
@@ -207,88 +210,88 @@ ENDPOINTS = [
      None, "json", False, "Path param: pk (integer). Query params (optional): uploaded_doc_pk, uploaded_doc_uuid, only_tagged, distinct_fields. Alt: /v1/transaction?book_pk=X also works."),
 
     # ── Fraud Detection / Detect (v2) ──
-    ("Fraud Detection", "detectBookSignals", "detect/book/{book_uuid}/signals — Book-level fraud signals",
+    ("Detect", "detectBookSignals", "detect/book/{book_uuid}/signals — Book-level fraud signals",
      "GET", "/v2/detect/book/{book_uuid}/signals",
      [{"name": "book_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Book UUID"}],
      None, "json", False,
      "Path param: book_uuid (UUID). Returns authenticity scores (0-100), reason codes, and signal types."),
 
-    ("Fraud Detection", "detectDocumentSignals", "detect/document/{doc_uuid}/signals — Document-level fraud signals",
+    ("Detect", "detectDocumentSignals", "detect/document/{doc_uuid}/signals — Document-level fraud signals",
      "GET", "/v2/detect/document/{doc_uuid}/signals",
      [{"name": "doc_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Document UUID"}],
      None, "json", False, "Path param: doc_uuid (UUID)."),
 
-    ("Fraud Detection", "detectVisualization", "detect/visualization/{visualization_uuid} — Signal visualization",
+    ("Detect", "detectVisualization", "detect/visualization/{visualization_uuid} — Signal visualization",
      "GET", "/v2/detect/visualization/{visualization_uuid}",
      [{"name": "visualization_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Visualization UUID"}],
      None, "binary", False,
      "Path param: visualization_uuid (UUID). Returns binary image with fraud signal overlays."),
 
-    ("Fraud Detection", "suspiciousActivityFlags", "book/{book_uuid}/suspicious-activity-flags — LEGACY",
+    ("Detect", "suspiciousActivityFlags", "book/{book_uuid}/suspicious-activity-flags — LEGACY",
      "GET", "/v1/book/{book_uuid}/suspicious-activity-flags",
      [{"name": "book_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Book UUID"}],
      None, "json", True, "DEPRECATED. Use /v2/detect/ endpoints instead. Path param: book_uuid (UUID)."),
 
     # ── Cash Flow Analytics (v2) ──
-    ("Cash Flow Analytics", "bookSummary", "book/{book_uuid}/summary — Cash flow summary",
+    ("Analyze", "bookSummary", "book/{book_uuid}/summary — Cash flow summary",
      "GET", "/v2/book/{book_uuid}/summary",
      [{"name": "book_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Book UUID"}],
      None, "json", False, "Path param: book_uuid (UUID). Returns daily balances, PII, and time series data."),
 
-    ("Cash Flow Analytics", "bookCashFlowFeatures", "book/{book_uuid}/cash_flow_features — Cash flow features",
+    ("Analyze", "bookCashFlowFeatures", "book/{book_uuid}/cash_flow_features — Cash flow features",
      "GET", "/v2/book/{book_uuid}/cash_flow_features",
      [{"name": "book_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Book UUID"},
       {"name": "min_days_to_include", "in": "query", "type": "integer", "required": False, "description": "Min days for most recent month (default 0, use 32 for full months only)"}],
      None, "json", False, "Path param: book_uuid (UUID). Query param: min_days_to_include (integer, optional)."),
 
-    ("Cash Flow Analytics", "bookEnrichedTxns", "book/{book_uuid}/enriched_txns — Enriched transactions",
+    ("Analyze", "bookEnrichedTxns", "book/{book_uuid}/enriched_txns — Enriched transactions",
      "GET", "/v2/book/{book_uuid}/enriched_txns",
      [{"name": "book_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Book UUID"}],
      None, "json", False, "Path param: book_uuid (UUID). Returns transactions with categories and tags."),
 
-    ("Cash Flow Analytics", "bookCashFlowRiskScore", "book/{book_uuid}/cash_flow_risk_score — Risk score",
+    ("Analyze", "bookCashFlowRiskScore", "book/{book_uuid}/cash_flow_risk_score — Risk score",
      "GET", "/v2/book/{book_uuid}/cash_flow_risk_score",
      [{"name": "book_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Book UUID"}],
      None, "json", False, "Path param: book_uuid (UUID). Returns probability of default."),
 
-    ("Cash Flow Analytics", "bookBenchmarking", "book/{book_uuid}/benchmarking — Benchmarking (Beta)",
+    ("Analyze", "bookBenchmarking", "book/{book_uuid}/benchmarking — Benchmarking (Beta)",
      "GET", "/v2/book/{book_uuid}/benchmarking",
      [{"name": "book_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Book UUID"}],
      None, "json", False, "Path param: book_uuid (UUID). NAICS4-based benchmarking. Beta feature."),
 
-    ("Cash Flow Analytics", "bookLenderAnalyticsXlsx", "book/{book_uuid}/lender_analytics/xlsx — SMB analytics Excel",
+    ("Analyze", "bookLenderAnalyticsXlsx", "book/{book_uuid}/lender_analytics/xlsx — SMB analytics Excel",
      "GET", "/v2/book/{book_uuid}/lender_analytics/xlsx",
      [{"name": "book_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Book UUID"}],
      None, "excel", False, "Path param: book_uuid (UUID). Returns .xlsx binary content."),
 
     # ── Income Calculations (v2) ──
-    ("Income Calculations", "bookIncomeCalculations", "book/{book_uuid}/income-calculations — Income calculations",
+    ("Income", "bookIncomeCalculations", "book/{book_uuid}/income-calculations — Income calculations",
      "GET", "/v2/book/{book_uuid}/income-calculations",
      [{"name": "book_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Book UUID"},
       {"name": "guideline", "in": "query", "type": "string", "required": False, "description": "Guideline: FANNIE_MAE, FREDDIE_MAC, FHA, VA, USDA"}],
      None, "json", False, "Path param: book_uuid (UUID). Query param: guideline (string, optional)."),
 
-    ("Income Calculations", "bookIncomeSummary", "book/{book_uuid}/income-summary — Income summary",
+    ("Income", "bookIncomeSummary", "book/{book_uuid}/income-summary — Income summary",
      "GET", "/v2/book/{book_uuid}/income-summary",
      [{"name": "book_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Book UUID"}],
      None, "json", False, "Path param: book_uuid (UUID)."),
 
-    ("Income Calculations", "bookIncomeEntity", "book/{book_uuid}/income-entity — Configure income entity",
+    ("Income", "bookIncomeEntity", "book/{book_uuid}/income-entity — Configure income entity",
      "POST", "/v2/book/{book_uuid}/income-entity",
      [{"name": "book_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Book UUID"}],
      {"config": "object"}, "json", False, "Path param: book_uuid (UUID). Body: JSON."),
 
-    ("Income Calculations", "bookIncomeGuideline", "book/{book_uuid}/income-guideline — Save income guideline",
+    ("Income", "bookIncomeGuideline", "book/{book_uuid}/income-guideline — Save income guideline",
      "PUT", "/v2/book/{book_uuid}/income-guideline",
      [{"name": "book_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Book UUID"}],
      {"guideline": "object"}, "json", False, "Path param: book_uuid (UUID). Body: JSON."),
 
-    ("Income Calculations", "bookSelfEmployedIncome", "book/{book_uuid}/self-employed-income — Fannie Mae self-employed",
+    ("Income", "bookSelfEmployedIncome", "book/{book_uuid}/self-employed-income — Fannie Mae self-employed",
      "POST", "/v2/book/{book_uuid}/self-employed-income",
      [{"name": "book_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Book UUID"}],
      {"params": "object"}, "json", False, "Path param: book_uuid (UUID). Body: JSON. Call BEFORE income-calculations."),
 
-    ("Income Calculations", "bookBsic", "book/{book_uuid}/bsic — BSIC results",
+    ("Income", "bookBsic", "book/{book_uuid}/bsic — BSIC results",
      "GET", "/v2/book/{book_uuid}/bsic",
      [{"name": "book_uuid", "in": "path", "type": "string", "format": "uuid", "required": True, "description": "Book UUID"}],
      None, "json", False, "Path param: book_uuid (UUID). Bank Statement Income Calculator results."),
@@ -332,84 +335,84 @@ ENDPOINTS = [
      {"txn_pk": "integer", "tag_uuids": "array"}, "json", False, "Path param: book_uuid (UUID). Body: JSON."),
 
     # ── Encore / Book Copy (v1) ──
-    ("Encore / Book Copy", "bookCopyJobsCreate", "book/copy-jobs — Create book copy jobs",
+    ("Encore", "bookCopyJobsCreate", "book/copy-jobs — Create book copy jobs",
      "POST", "/v1/book/copy-jobs", [],
      {"jobs": "array"}, "json", False, "Body: JSON. Max 50 jobs per call."),
 
-    ("Encore / Book Copy", "bookCopyJobsList", "book/copy-jobs — List book copy jobs",
+    ("Encore", "bookCopyJobsList", "book/copy-jobs — List book copy jobs",
      "GET", "/v1/book/copy-jobs",
      [{"name": "direction", "in": "query", "type": "string", "required": False, "description": "'outbound' or 'inbound'"}],
      None, "json", False, "Query param: direction (string, optional — 'outbound' or 'inbound')."),
 
-    ("Encore / Book Copy", "bookCopyJobAccept", "book/copy-jobs/{job_id}/accept — Accept a copy job",
+    ("Encore", "bookCopyJobAccept", "book/copy-jobs/{job_id}/accept — Accept a copy job",
      "POST", "/v1/book/copy-jobs/{job_id}/accept",
      [{"name": "job_id", "in": "path", "type": "string", "required": True, "description": "Copy job ID"}],
      {"name": "string"}, "json", False, "Path param: job_id (string). Body: JSON."),
 
-    ("Encore / Book Copy", "bookCopyJobReject", "book/copy-jobs/{job_id}/reject — Reject a copy job",
+    ("Encore", "bookCopyJobReject", "book/copy-jobs/{job_id}/reject — Reject a copy job",
      "POST", "/v1/book/copy-jobs/{job_id}/reject",
      [{"name": "job_id", "in": "path", "type": "string", "required": True, "description": "Copy job ID"}],
      None, "json", False, "Path param: job_id (string)."),
 
-    ("Encore / Book Copy", "bookCopyJobsRunKickouts", "book/copy-jobs/run-kickouts — Run automated kick-outs",
+    ("Encore", "bookCopyJobsRunKickouts", "book/copy-jobs/run-kickouts — Run automated kick-outs",
      "POST", "/v1/book/copy-jobs/run-kickouts", [],
      None, "json", False, "No params. Runs on all AWAITING_RECIPIENT jobs."),
 
-    ("Encore / Book Copy", "settingsBookCopy", "settings/book-copy — Get book copy settings",
+    ("Encore", "settingsBookCopy", "settings/book-copy — Get book copy settings",
      "GET", "/v1/settings/book-copy", [],
      None, "json", False, "No params."),
 
     # ── Webhooks - Org Level ──
-    ("Webhooks (Org)", "accountSettingsWebhookAdd", "account/settings/webhook — Add org-level webhook",
+    ("Webhooks (Org Level)", "accountSettingsWebhookAdd", "account/settings/webhook — Add org-level webhook",
      "POST", "/v1/account/settings/webhook", [],
      {"url": "string", "events": "array"}, "json", False, "Body: JSON."),
 
-    ("Webhooks (Org)", "accountSettingsWebhooksList", "account/settings/webhooks — List org-level webhooks",
+    ("Webhooks (Org Level)", "accountSettingsWebhooksList", "account/settings/webhooks — List org-level webhooks",
      "GET", "/v1/account/settings/webhooks", [],
      None, "json", False, "No params."),
 
-    ("Webhooks (Org)", "accountSettingsWebhookGet", "account/settings/webhooks/{webhook_id} — Retrieve webhook",
+    ("Webhooks (Org Level)", "accountSettingsWebhookGet", "account/settings/webhooks/{webhook_id} — Retrieve webhook",
      "GET", "/v1/account/settings/webhooks/{webhook_id}",
      [{"name": "webhook_id", "in": "path", "type": "string", "required": True, "description": "Webhook ID"}],
      None, "json", False, "Path param: webhook_id (string)."),
 
-    ("Webhooks (Org)", "accountSettingsWebhookUpdate", "account/settings/webhooks/{webhook_id} — Update webhook",
+    ("Webhooks (Org Level)", "accountSettingsWebhookUpdate", "account/settings/webhooks/{webhook_id} — Update webhook",
      "PUT", "/v1/account/settings/webhooks/{webhook_id}",
      [{"name": "webhook_id", "in": "path", "type": "string", "required": True, "description": "Webhook ID"}],
      {"url": "string", "events": "array"}, "json", False, "Path param: webhook_id (string). Body: JSON."),
 
-    ("Webhooks (Org)", "accountSettingsWebhookDelete", "account/settings/webhooks/{webhook_id} — Delete webhook",
+    ("Webhooks (Org Level)", "accountSettingsWebhookDelete", "account/settings/webhooks/{webhook_id} — Delete webhook",
      "DELETE", "/v1/account/settings/webhooks/{webhook_id}",
      [{"name": "webhook_id", "in": "path", "type": "string", "required": True, "description": "Webhook ID"}],
      None, "json", False, "Path param: webhook_id (string)."),
 
-    ("Webhooks (Org)", "accountSettingsWebhooksEvents", "account/settings/webhooks/events — List event types",
+    ("Webhooks (Org Level)", "accountSettingsWebhooksEvents", "account/settings/webhooks/events — List event types",
      "GET", "/v1/account/settings/webhooks/events", [],
      None, "json", False, "No params."),
 
-    ("Webhooks (Org)", "accountSettingsWebhookTest", "account/settings/webhooks/{webhook_id}/test — Test webhook",
+    ("Webhooks (Org Level)", "accountSettingsWebhookTest", "account/settings/webhooks/{webhook_id}/test — Test webhook",
      "POST", "/v1/account/settings/webhooks/{webhook_id}/test",
      [{"name": "webhook_id", "in": "path", "type": "string", "required": True, "description": "Webhook ID"}],
      None, "json", False, "Path param: webhook_id (string)."),
 
-    ("Webhooks (Org)", "accountSettingsWebhooksSecret", "account/settings/webhooks/secret — Configure secret",
+    ("Webhooks (Org Level)", "accountSettingsWebhooksSecret", "account/settings/webhooks/secret — Configure secret",
      "POST", "/v1/account/settings/webhooks/secret", [],
      {"secret": "string"}, "json", False, "Body: JSON. Secret must be 16-128 characters."),
 
     # ── Webhooks - Account Level ──
-    ("Webhooks (Account)", "webhookConfigure", "webhook/configure — Configure account webhook",
+    ("Webhooks (Account Level)", "webhookConfigure", "webhook/configure — Configure account webhook",
      "POST", "/v1/webhook/configure", [],
      {"url": "string", "events": "array"}, "json", False, "Body: JSON."),
 
-    ("Webhooks (Account)", "webhookConfiguration", "webhook/configuration — Get account webhook config",
+    ("Webhooks (Account Level)", "webhookConfiguration", "webhook/configuration — Get account webhook config",
      "GET", "/v1/webhook/configuration", [],
      None, "json", False, "No params."),
 
-    ("Webhooks (Account)", "webhookTest", "webhook/test — Test account webhook",
+    ("Webhooks (Account Level)", "webhookTest", "webhook/test — Test account webhook",
      "POST", "/v1/webhook/test", [],
      None, "json", False, "No params."),
 
-    ("Webhooks (Account)", "webhookSecret", "webhook/secret — Configure account webhook secret",
+    ("Webhooks (Account Level)", "webhookSecret", "webhook/secret — Configure account webhook secret",
      "POST", "/v1/webhook/secret", [],
      {"secret": "string"}, "json", False, "Body: JSON."),
 ]
@@ -515,19 +518,47 @@ DOCS_BASE_URL = "https://docs.ocrolus.com/reference"
 # Type mapping helpers
 # ---------------------------------------------------------------------------
 
-def _oas3_type(t: str) -> dict:
-    """Map simple type string to OpenAPI 3 schema."""
+def _oas3_type(t: str, field_name: str = "") -> dict:
+    """Map simple type string to OpenAPI 3 schema with example values for Postman."""
+    # Field-specific examples that help Postman pre-fill useful placeholder values
+    field_examples = {
+        "name": "My Book",
+        "book_type": "DEFAULT",
+        "pk": 71250194,
+        "book_id": 71250194,
+        "book_uuid": "09c52985-2f05-4022-a738-9277cc335c7e",
+        "doc_pk": 12345678,
+        "doc_id": 12345678,
+        "doc_uuid": "aaaa1111-bbbb-2222-cccc-333344445555",
+        "mixed_doc_pk": 12345678,
+        "mixed_doc_uuid": "aaaa1111-bbbb-2222-cccc-333344445555",
+        "form_type": "bank_statement",
+        "doc_name": "January 2026 Statement",
+        "upgrade_type": "INSTANT",
+        "image_group": "group-1",
+        "audit_copy_token": "<plaid_audit_copy_token>",
+        "accept_charges": True,
+        "grant_type": "client_credentials",
+        "client_id": "<your_client_id>",
+        "client_secret": "<your_client_secret>",
+        "url": "https://example.com/webhook",
+        "secret": "<webhook_secret_16_to_128_chars>",
+    }
     if t == "integer":
-        return {"type": "integer"}
-    if t == "boolean":
-        return {"type": "boolean"}
-    if t == "array":
-        return {"type": "array", "items": {"type": "string"}}
-    if t == "object":
-        return {"type": "object"}
-    if t == "file":
-        return {"type": "string", "format": "binary"}
-    return {"type": "string"}
+        schema = {"type": "integer"}
+    elif t == "boolean":
+        schema = {"type": "boolean"}
+    elif t == "array":
+        schema = {"type": "array", "items": {"type": "string"}}
+    elif t == "object":
+        schema = {"type": "object"}
+    elif t == "file":
+        schema = {"type": "string", "format": "binary"}
+    else:
+        schema = {"type": "string"}
+    if field_name in field_examples:
+        schema["example"] = field_examples[field_name]
+    return schema
 
 
 def _swagger2_type(t: str) -> dict:
@@ -656,27 +687,45 @@ def generate_openapi3() -> dict:
         "paths": {},
     }
 
-    # Collect unique tags
-    seen_tags = set()
     tag_descriptions = {
         "Authentication": "OAuth 2.0 token management",
-        "Book Operations": "Create, read, update, delete Books (v1, book_pk)",
-        "Document Upload": "Upload and manage documents within Books",
-        "Classification": "Document classification / Classify (v2, book_uuid)",
-        "Data Extraction": "Data extraction / Capture (v1, book_pk)",
-        "Fraud Detection": "Fraud detection / Detect (v2, book_uuid)",
-        "Cash Flow Analytics": "Cash flow analytics / Analyze (v2, book_uuid)",
-        "Income Calculations": "Income calculations (v2, book_uuid)",
-        "Tag Management": "Transaction tag management (v2, Beta)",
-        "Encore / Book Copy": "Book copy / Encore operations (v1)",
-        "Webhooks (Org)": "Organization-level webhook management (recommended)",
-        "Webhooks (Account)": "Account-level webhook management (legacy)",
+        "Book Commands": "Create, update, and delete Books",
+        "Book Queries": "Read Book information, status, and related loan data",
+        "File Uploads": "Upload documents, paystubs, images, and Plaid data to Books",
+        "File Commands": "Cancel, delete, download, and upgrade documents",
+        "File Queries": "Retrieve file and mixed-document status",
+        "Classify": "Identify document types with confidence scores",
+        "Capture": "Extract structured data from documents (forms, paystubs, transactions)",
+        "Detect": "Fraud detection signals, authenticity scores, and reason codes",
+        "Analyze": "Cash flow analytics, enriched transactions, and risk scoring",
+        "Income": "Income calculations, BSIC, and self-employed income",
+        "Tag Management": "Transaction tag management (Beta)",
+        "Encore": "Book copy jobs for organization-to-organization sharing",
+        "Webhooks (Account Level)": "Account-level webhook management (legacy)",
+        "Webhooks (Org Level)": "Organization-level webhook management (recommended)",
     }
 
-    for ep in ENDPOINTS:
-        tag = ep[0]
-        if tag not in seen_tags:
-            seen_tags.add(tag)
+    # Add tags in the official docs-site order
+    tag_order = [
+        "Authentication",
+        "Book Commands",
+        "Book Queries",
+        "File Uploads",
+        "File Commands",
+        "File Queries",
+        "Classify",
+        "Capture",
+        "Detect",
+        "Analyze",
+        "Encore",
+        "Income",
+        "Tag Management",
+        "Webhooks (Account Level)",
+        "Webhooks (Org Level)",
+    ]
+    tags_in_use = {ep[0] for ep in ENDPOINTS}
+    for tag in tag_order:
+        if tag in tags_in_use:
             spec["tags"].append({"name": tag, "description": tag_descriptions.get(tag, "")})
 
     # Build paths
@@ -700,8 +749,8 @@ def generate_openapi3() -> dict:
                                 "required": ["grant_type", "client_id", "client_secret"],
                                 "properties": {
                                     "grant_type": {"type": "string", "example": "client_credentials"},
-                                    "client_id": {"type": "string"},
-                                    "client_secret": {"type": "string"},
+                                    "client_id": {"type": "string", "example": "<your_client_id>"},
+                                    "client_secret": {"type": "string", "example": "<your_client_secret>"},
                                 },
                             }
                         }
@@ -768,7 +817,7 @@ def generate_openapi3() -> dict:
             if is_multipart:
                 props = {}
                 for k, v in req_body.items():
-                    props[k] = _oas3_type(v)
+                    props[k] = _oas3_type(v, k)
                 operation["requestBody"] = {
                     "required": True,
                     "content": {
@@ -780,7 +829,7 @@ def generate_openapi3() -> dict:
             else:
                 props = {}
                 for k, v in req_body.items():
-                    props[k] = _oas3_type(v)
+                    props[k] = _oas3_type(v, k)
                 operation["requestBody"] = {
                     "required": True,
                     "content": {
@@ -854,11 +903,27 @@ def generate_swagger2() -> dict:
         "paths": {},
     }
 
-    seen_tags = set()
-    for ep in ENDPOINTS:
-        tag = ep[0]
-        if tag not in seen_tags:
-            seen_tags.add(tag)
+    # Add tags in the official docs-site order
+    tag_order_sw2 = [
+        "Authentication",
+        "Book Commands",
+        "Book Queries",
+        "File Uploads",
+        "File Commands",
+        "File Queries",
+        "Classify",
+        "Capture",
+        "Detect",
+        "Analyze",
+        "Encore",
+        "Income",
+        "Tag Management",
+        "Webhooks (Account Level)",
+        "Webhooks (Org Level)",
+    ]
+    tags_in_use_sw2 = {ep[0] for ep in ENDPOINTS}
+    for tag in tag_order_sw2:
+        if tag in tags_in_use_sw2:
             spec["tags"].append({"name": tag})
 
     for tag, op_id, summary, method, path, params, req_body, resp_type, deprecated, notes in ENDPOINTS:
