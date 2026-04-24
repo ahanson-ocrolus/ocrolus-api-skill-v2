@@ -25,20 +25,25 @@
 |----------|------|-------|------------|--------|
 | `oauth/token` | `POST https://auth.ocrolus.com/oauth/token` | Body (form-encoded) | `_get_token()` (auto) | :white_check_mark: Form-encoded, no audience param |
 
-## Book Operations
+## Book Commands
 
 | Endpoint | Path | Input | SDK Method | Status |
 |----------|------|-------|------------|--------|
 | `book/add` | `POST /v1/book/add` | Body (JSON): `name`, `book_type` | `create_book()` | :hammer_and_wrench: CORRECTED from `/v1/book/create` |
 | `book/delete` | `POST /v1/book/delete` | Body (JSON): `book_id` OR `book_uuid` | `delete_book()` | :white_check_mark: |
 | `book/update` | `POST /v1/book/update` | Body (JSON): `pk` OR `book_uuid`, `name` | `update_book()` | :white_check_mark: |
+
+## Book Queries
+
+| Endpoint | Path | Input | SDK Method | Status |
+|----------|------|-------|------------|--------|
 | `book/{pk}` | `GET /v1/book/{pk}` | Path: `pk` (integer) | `get_book()` | :white_check_mark: |
 | `books` | `GET /v1/books` | Query (optional): `page`, `per_page` | `list_books()` | :white_check_mark: |
 | `book/status` | `GET /v1/book/status?book_pk={pk}` | Query: `book_pk` (integer) | `get_book_status()` | :white_check_mark: Both query and path param work |
 | `book/loan/{loan_id}` | `GET /v1/book/loan/{loan_id}` | Path: `loan_id` (string) | `get_book_from_loan()` | :white_check_mark: |
 | `book/{pk}/loan` | `GET /v1/book/{pk}/loan` | Path: `pk` (integer) | `get_loan_from_book()` | :white_check_mark: |
 
-## Document Upload & Management
+## File Uploads
 
 | Endpoint | Path | Input | SDK Method | Status |
 |----------|------|-------|------------|--------|
@@ -49,14 +54,24 @@
 | `book/finalize-image-group` | `POST /v1/book/finalize-image-group` | Body (JSON): `pk` OR `book_uuid`, `image_group` | `finalize_image_group()` | :white_check_mark: |
 | `book/upload/plaid` | `POST /v1/book/upload/plaid` | Body (JSON): `pk` OR `book_uuid` | `upload_plaid_json()` | :white_check_mark: |
 | `book/import/plaid/asset` | `POST /v1/book/import/plaid/asset` | Body (JSON): `audit_copy_token` | `import_plaid_asset_report()` | :white_check_mark: |
+
+## File Commands
+
+| Endpoint | Path | Input | SDK Method | Status |
+|----------|------|-------|------------|--------|
 | `document/cancel` | `POST /v1/document/{doc_uuid}/cancel` | Path: `doc_uuid`; Body (JSON): `doc_pk` OR `doc_uuid`, `accept_charges` | `cancel_document()` | :white_check_mark: |
 | `document/remove` | `POST /v1/document/{doc_uuid}/delete` | Path: `doc_uuid`; Body (JSON): `doc_id` OR `doc_uuid` | `delete_document()` | :white_check_mark: |
 | `document/{doc_uuid}/download` | `GET /v1/document/{doc_uuid}/download` | Path: `doc_uuid` (UUID) | `download_document()` | :white_check_mark: |
 | `document/upgrade` | `POST /v1/document/{doc_uuid}/upgrade` | Path: `doc_uuid`; Body (JSON): `doc_pk` OR `doc_uuid`, `upgrade_type` | `upgrade_document()` | :white_check_mark: |
 | `document/mixed/upgrade` | `POST /v1/document/mixed/upgrade` | Body (JSON): `mixed_doc_pk` OR `mixed_doc_uuid`, `upgrade_type` | `upgrade_mixed_document()` | :white_check_mark: |
+
+## File Queries
+
+| Endpoint | Path | Input | SDK Method | Status |
+|----------|------|-------|------------|--------|
 | `document/mixed/status` | `GET /v1/document/mixed/status` | Query: `pk` OR `doc_uuid` OR `mixed_doc_uuid` | `get_mixed_document_status()` | :white_check_mark: |
 
-## Classification (Classify)
+## Classify
 
 | Endpoint | Path | Input | SDK Method | Status |
 |----------|------|-------|------------|--------|
@@ -64,7 +79,7 @@
 | `mixed-document/{uuid}/classification-summary` | `GET /v2/mixed-document/{uuid}/classification-summary` | Path: `mixed_doc_uuid` (UUID) | `get_mixed_doc_classification_summary()` | :white_check_mark: |
 | `index/mixed-doc/{uuid}/summary` | `GET /v2/index/mixed-doc/{uuid}/summary` | Path: `mixed_doc_uuid` (UUID) | `get_grouped_mixed_doc_summary()` | :white_check_mark: |
 
-## Data Extraction (Capture)
+## Capture
 
 | Endpoint | Path | Input | SDK Method | Status |
 |----------|------|-------|------------|--------|
@@ -76,7 +91,7 @@
 | `paystub/{uuid}` | `GET /v1/paystub/{uuid}` | Path: `paystub_uuid` (UUID) | `get_paystub()` | :white_check_mark: |
 | `book/{pk}/transactions` | `GET /v1/book/{pk}/transactions` | Path: `pk` (integer); Query (opt): `uploaded_doc_pk`, `uploaded_doc_uuid`, `only_tagged`, `distinct_fields` | `get_book_transactions()` | :white_check_mark: Both path and query param work |
 
-## Fraud Detection (Detect)
+## Detect
 
 | Endpoint | Path | Input | SDK Method | Status |
 |----------|------|-------|------------|--------|
@@ -91,7 +106,7 @@
 - File Origin vs File Tampering signal types documented
 - Score thresholds and interpretation guidance included
 
-## Cash Flow Analytics
+## Analyze (Cash Flow)
 
 | Endpoint | Path | Input | SDK Method | Status |
 |----------|------|-------|------------|--------|
@@ -102,7 +117,7 @@
 | `book/{uuid}/benchmarking` | `GET /v2/book/{uuid}/benchmarking` | Path: `book_uuid` (UUID) | `get_benchmarking()` | :white_check_mark: |
 | `book/{uuid}/lender_analytics/xlsx` | `GET /v2/book/{uuid}/lender_analytics/xlsx` | Path: `book_uuid` (UUID) | `get_analytics_excel()` | :white_check_mark: |
 
-## Income Calculations
+## Income
 
 | Endpoint | Path | Input | SDK Method | Status |
 |----------|------|-------|------------|--------|
@@ -114,7 +129,7 @@
 | `book/{uuid}/bsic` | `GET /v2/book/{uuid}/bsic` | Path: `book_uuid` (UUID) | `get_bsic()` | :white_check_mark: |
 | `book/{uuid}/bsic` (Excel) | `GET /v2/book/{uuid}/bsic` (Accept: xlsx) | Path: `book_uuid` (UUID); Header: Accept | `get_bsic_excel()` | :white_check_mark: |
 
-## Tag Management (Beta)
+## Tag Management
 
 | Endpoint | Path | Input | SDK Method | Status |
 |----------|------|-------|------------|--------|
@@ -127,7 +142,7 @@
 | `analytics/revenue-deduction-tags` (update) | `PUT /v2/analytics/revenue-deduction-tags` | Body (JSON): `tag_names` | `update_revenue_deduction_tags()` | :white_check_mark: |
 | `analytics/book/{uuid}/transactions` | `PUT /v2/analytics/book/{uuid}/transactions` | Path: `book_uuid` (UUID); Body (JSON): `txn_pk`, `tag_uuids` | `override_transaction_tag()` | :white_check_mark: |
 
-## Encore / Book Copy
+## Encore
 
 | Endpoint | Path | Input | SDK Method | Status |
 |----------|------|-------|------------|--------|
@@ -138,7 +153,7 @@
 | `book/copy-jobs/run-kickouts` | `POST /v1/book/copy-jobs/run-kickouts` | None | `run_book_copy_kickouts()` | :white_check_mark: |
 | `settings/book-copy` | `GET /v1/settings/book-copy` | None | `get_book_copy_settings()` | :white_check_mark: |
 
-## Webhooks -- Org-Level
+## Webhooks (Org Level)
 
 | Endpoint | Path | Input | SDK Method | Status |
 |----------|------|-------|------------|--------|
@@ -151,7 +166,7 @@
 | `account/settings/webhooks/{id}/test` | `POST /v1/account/settings/webhooks/{id}/test` | Path: `webhook_id` (string) | `test_org_webhook()` | :white_check_mark: |
 | `account/settings/webhooks/secret` | `POST /v1/account/settings/webhooks/secret` | Body (JSON): `secret` | `configure_org_webhook_secret()` | :white_check_mark: |
 
-## Webhooks -- Account-Level
+## Webhooks (Account Level)
 
 | Endpoint | Path | Input | SDK Method | Status |
 |----------|------|-------|------------|--------|
@@ -217,17 +232,20 @@ All v1 endpoints support both path-param and query-param styles:
 | Category | Total Endpoints | SDK Methods | Ref Documented | Live Validated |
 |----------|----------------|------------|----------------|---------------|
 | Authentication | 1 | 1 | 1 | :white_check_mark: |
-| Book Operations | 8 | 8 | 8 | :white_check_mark: (1 corrected) |
-| Document Upload | 13 | 13 | 13 | :white_check_mark: (1 corrected) |
-| Classification | 3 | 3 | 3 | :white_check_mark: |
-| Data Extraction | 7 | 7 | 7 | :white_check_mark: |
-| Fraud Detection | 4 | 3 (+1 legacy) | 4 | :white_check_mark: |
-| Cash Flow Analytics | 6 | 6 | 6 | :white_check_mark: |
-| Income Calculations | 7 | 7 | 7 | :white_check_mark: |
+| Book Commands | 3 | 3 | 3 | :white_check_mark: (1 corrected) |
+| Book Queries | 5 | 5 | 5 | :white_check_mark: |
+| File Uploads | 7 | 7 | 7 | :white_check_mark: (1 corrected) |
+| File Commands | 5 | 5 | 5 | :white_check_mark: |
+| File Queries | 1 | 1 | 1 | :white_check_mark: |
+| Classify | 3 | 3 | 3 | :white_check_mark: |
+| Capture | 7 | 7 | 7 | :white_check_mark: |
+| Detect | 4 | 3 (+1 legacy) | 4 | :white_check_mark: |
+| Analyze (Cash Flow) | 6 | 6 | 6 | :white_check_mark: |
+| Income | 7 | 7 | 7 | :white_check_mark: |
 | Tag Management | 8 | 8 | 8 | :white_check_mark: (1 broken: revenue-deduction-tags) |
-| Encore / Book Copy | 6 | 6 | 6 | :white_check_mark: |
-| Webhooks (Org) | 8 | 8 | 8 | :white_check_mark: (1 unavailable: secret config) |
-| Webhooks (Account) | 4 | 4 | 4 | :white_check_mark: (1 unavailable: get config) |
+| Encore | 6 | 6 | 6 | :white_check_mark: |
+| Webhooks (Account Level) | 4 | 4 | 4 | :white_check_mark: (1 unavailable: get config) |
+| Webhooks (Org Level) | 8 | 8 | 8 | :white_check_mark: (1 unavailable: secret config) |
 | LOS Connect | 2 | 0 | 2 | :memo: Discovered from official spec |
 | V2 Document Ops | 7 | 0 | 7 | :memo: Discovered from official spec |
 | Kickout Rules | 2 | 0 | 2 | :memo: 1 reachable, 1 returns 404 |
