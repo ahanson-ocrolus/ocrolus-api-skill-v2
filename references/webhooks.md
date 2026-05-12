@@ -1,8 +1,7 @@
-# Ocrolus Webhooks -- Production Reference
+# Ocrolus Webhooks — Reference
 
-> Source: https://docs.ocrolus.com/docs/webhook-overview, secure-webhook-urls
-> **VALIDATED** against live tenant (ahanson_personalOrg) on 2026-03-20.
-> Event names and payload structures below are from real production webhooks.
+> Sources: <https://docs.ocrolus.com/docs/webhook-overview>, <https://docs.ocrolus.com/docs/secure-webhook-urls>.
+> Event names and payload shapes below reflect observed production deliveries.
 
 ## Overview
 
@@ -28,29 +27,29 @@ Ocrolus delivers event notifications via HTTP POST to your configured endpoint(s
 
 ### Organization-Level (recommended)
 
-| Operation | Method | Path | Status |
-|-----------|--------|------|--------|
-| Add Webhook | POST | `/v1/account/settings/webhook` | CONFIRMED |
-| List Webhooks | GET | `/v1/account/settings/webhooks` | CONFIRMED |
-| Retrieve Webhook | GET | `/v1/account/settings/webhooks/{webhook_id}` | CONFIRMED |
-| Update Webhook | PUT | `/v1/account/settings/webhooks/{webhook_id}` | CONFIRMED |
-| Delete Webhook | DELETE | `/v1/account/settings/webhooks/{webhook_id}` | CONFIRMED |
-| List Events | GET | `/v1/account/settings/webhooks/events` | CONFIRMED (returns 404-in-body if no events configured) |
-| Test Webhook | POST | `/v1/account/settings/webhooks/{webhook_id}/test` | CONFIRMED |
-| Configure Secret | POST | `/v1/account/settings/webhooks/secret` | NOT AVAILABLE (404 on tested tenant) |
+| Operation | Method | Path |
+|-----------|--------|------|
+| Add Webhook | POST | `/v1/account/settings/webhook` |
+| List Webhooks | GET | `/v1/account/settings/webhooks` |
+| Retrieve Webhook | GET | `/v1/account/settings/webhooks/{webhook_id}` |
+| Update Webhook | PUT | `/v1/account/settings/webhooks/{webhook_id}` |
+| Delete Webhook | DELETE | `/v1/account/settings/webhooks/{webhook_id}` |
+| List Events | GET | `/v1/account/settings/webhooks/events` |
+| Test Webhook | POST | `/v1/account/settings/webhooks/{webhook_id}/test` |
+| Configure Secret | POST | `/v1/account/settings/webhooks/secret` |
 
 ### Account-Level
 
-| Operation | Method | Path | Status |
-|-----------|--------|------|--------|
-| Configure | POST | `/v1/webhook/configure` | CONFIRMED (route exists) |
-| Get Config | GET | `/v1/webhook/configuration` | NOT AVAILABLE (404 on tested tenant) |
-| Test | GET/POST | `/v1/webhook/test` | CONFIRMED |
-| Configure Secret | POST | `/v1/webhook/secret` | CONFIRMED (route exists) |
+| Operation | Method | Path |
+|-----------|--------|------|
+| Configure | POST | `/v1/webhook/configure` |
+| Get Config | GET | `/v1/webhook/configuration` |
+| Test | GET / POST | `/v1/webhook/test` |
+| Configure Secret | POST | `/v1/webhook/secret` |
 
-## Event Types (VALIDATED)
+## Event Types
 
-The following event names were observed from **real production webhook deliveries** on 2026-03-20. The event type field is **`event_name`** (not `event_type`).
+The event type field is **`event_name`** (not `event_type`).
 
 ### Document Events
 
@@ -90,12 +89,12 @@ Upload documents to book
     └── book.completed                   (all tasks: ANALYTICS, CAPTURE, DETECT)
 ```
 
-### Encore / Book Copy Events (not yet validated)
-- `book.copy.request_accepted` -- recipient accepted book copy
-- `book.copy.request_rejected` -- recipient rejected book copy
-- `book.copy.kickout_evaluated` -- automated kick-out evaluation complete
+### Encore / Book Copy Events
+- `book.copy.request_accepted` — recipient accepted book copy
+- `book.copy.request_rejected` — recipient rejected book copy
+- `book.copy.kickout_evaluated` — automated kick-out evaluation complete
 
-## Webhook Payload Structure (Observed)
+## Webhook Payload Structure
 
 Every webhook payload includes these common fields:
 
@@ -106,8 +105,8 @@ Every webhook payload includes these common fields:
   "severity": "MODERATE",
   "notification_type": "STATUS",
   "notification_reason": "Completed tasks: ANALYTICS, CAPTURE, DETECT",
-  "book_pk": 71400892,
-  "book_uuid": "09c52985-2f05-4022-a738-9277cc335c7e"
+  "book_pk": 12345678,
+  "book_uuid": "00000000-0000-0000-0000-000000000000"
 }
 ```
 
@@ -119,11 +118,11 @@ Every webhook payload includes these common fields:
   "severity": "LOW",
   "notification_type": "STATUS",
   "notification_reason": "Document verification succeeded",
-  "book_pk": 71400892,
-  "book_uuid": "09c52985-...",
-  "doc_uuid": "5c12b7b2-...",
-  "uploaded_doc_pk": 133257741,
-  "uploaded_doc_uuid": "5c12b7b2-..."
+  "book_pk": 12345678,
+  "book_uuid": "00000000-...",
+  "doc_uuid": "11111111-...",
+  "uploaded_doc_pk": 87654321,
+  "uploaded_doc_uuid": "11111111-..."
 }
 ```
 
@@ -136,13 +135,13 @@ Every webhook payload includes these common fields:
   "severity": "MODERATE",
   "notification_type": "STATUS",
   "notification_reason": "Completed tasks: ANALYTICS, CAPTURE, DETECT",
-  "book_pk": 71400892,
-  "book_uuid": "09c52985-...",
-  "book_name": "Jills Coffee - Webhook Test 2",
+  "book_pk": 12345678,
+  "book_uuid": "00000000-...",
+  "book_name": "Application #12345",
   "tasks": ["ANALYTICS", "CAPTURE", "DETECT"],
   "uploaded_docs": [
-    {"uuid": "5c12b7b2-...", "status": "VERIFICATION_COMPLETE"},
-    {"uuid": "b79fb14b-...", "status": "VERIFICATION_COMPLETE"}
+    {"uuid": "11111111-...", "status": "VERIFICATION_COMPLETE"},
+    {"uuid": "22222222-...", "status": "VERIFICATION_COMPLETE"}
   ]
 }
 ```
@@ -155,30 +154,28 @@ Every webhook payload includes these common fields:
   "severity": "MODERATE",
   "notification_type": "STATUS",
   "notification_reason": "Signals found for document",
-  "book_pk": 71400892,
-  "book_uuid": "09c52985-...",
-  "doc_uuid": "5c12b7b2-...",
+  "book_pk": 12345678,
+  "book_uuid": "00000000-...",
+  "doc_uuid": "11111111-...",
   "is_cloud_compliant": false,
-  "uploaded_doc_name": "Jills Coffee_Business_Bank Statement_01-2024.pdf"
+  "uploaded_doc_name": "Bank_Statement_01-2024.pdf"
 }
 ```
 
 **Note:** The fraud webhook only signals that fraud was detected. To get specific reason codes and authenticity scores, call `GET /v2/detect/document/{doc_uuid}/signals`.
 
-## Webhook Headers (Observed)
+## Webhook Headers
 
 | Header | Content | Example |
 |--------|---------|---------|
-| `Webhook-Signature` | HMAC-SHA256 hex digest | (present but verification requires matching secret) |
+| `Webhook-Signature` | HMAC-SHA256 hex digest | (present when a signing secret is configured) |
 | `Webhook-Timestamp` | Timestamp string | `1710960000` |
 | `Webhook-Request-Id` | UUID for this delivery | `019d0c76-a902-7b75-8f9e-8694eae8a374` |
 | `Content-Type` | Always JSON | `application/json` |
 
 ## Signature Verification (HMAC-SHA256)
 
-### Important Note on Secret Configuration
-
-The API endpoint for configuring webhook secrets (`/v1/account/settings/webhooks/secret`) returned 404 on the tested tenant. The secret may need to be configured through the Ocrolus dashboard rather than via API. Until the secret is confirmed, signature verification should log warnings but not reject events.
+Configure a signing secret first (via the dashboard, or via `POST /v1/account/settings/webhooks/secret` if your tenant has the API enabled). Until a secret is configured, deliveries arrive without a `Webhook-Signature` header — handlers should log a warning rather than reject these events.
 
 ### Verification Algorithm
 

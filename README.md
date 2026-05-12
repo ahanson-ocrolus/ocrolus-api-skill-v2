@@ -1,29 +1,29 @@
 # Ocrolus API Skill
 
-An AI-agent-ready skill for building [Ocrolus](https://www.ocrolus.com/) integrations. Give your AI coding assistant the `SKILL.md` file and it will know how to work with the Ocrolus API — correct endpoints, auth patterns, gotchas, and a validated Python SDK.
+An AI-agent-ready skill for building [Ocrolus](https://www.ocrolus.com/) integrations. Drop `SKILL.md` into your project and your AI coding assistant gets the right endpoints, auth patterns, webhook events, and a validated Python SDK — no trial-and-error needed.
 
 ## What's Here
 
 ```
-SKILL.md                  ← The skill file — feed this to your AI agent
-ocrolus_client.py         ← Python SDK (74 methods, CLI included)
-requirements.txt          ← SDK dependencies
-references/               ← API reference docs (endpoints, webhooks, fraud detection)
-tools/                    ← Optional utilities, examples, specs, and test findings
+SKILL.md             ← The skill — feed this to your AI agent
+ocrolus_client.py    ← Python SDK (CLI included)
+requirements.txt
+references/          ← Endpoint inventory, webhook events, fraud detection
+tools/               ← Health check, webhook setup, widget quickstart, OpenAPI spec, Postman collection
 ```
 
 ## Quick Start
 
-### 1. Use with an AI Agent
+### Use with an AI agent
 
 Point your AI assistant at `SKILL.md`:
 
-- **Claude Code:** Place this repo in your project, and the skill triggers automatically on Ocrolus-related prompts
-- **Other agents:** Include `SKILL.md` as context when asking the agent to build Ocrolus integrations
+- **Claude Code** — place this repo in your project; the skill activates on Ocrolus-related prompts.
+- **Other agents** — include `SKILL.md` as context when asking for Ocrolus integration help.
 
-The skill covers authentication, all endpoint paths (with corrections from live testing), webhook event names, fraud detection scoring, and common pitfalls.
+The skill covers authentication, capability-organized endpoints (Classify, Capture, Detect, Analyze, Income), webhooks, and the things developers commonly miss.
 
-### 2. Use the SDK Directly
+### Use the SDK directly
 
 ```bash
 pip install -r requirements.txt
@@ -36,17 +36,16 @@ from ocrolus_client import OcrolusClient
 
 client = OcrolusClient()
 
-# Create a book and upload a document
-book = client.create_book("Loan Application #12345")
+book = client.create_book("Application #12345")
 client.upload_pdf(book["pk"], "bank_statement.pdf")
-
-# Wait for processing, then get results
 client.wait_for_book(book["pk"], timeout=600)
-fraud = client.get_book_fraud_signals(book["uuid"])
+
 summary = client.get_book_summary(book["uuid"])
+fraud   = client.get_book_fraud_signals(book["uuid"])
+income  = client.get_income_calculations(book["uuid"])
 ```
 
-The SDK also works as a CLI:
+The SDK also runs as a CLI:
 
 ```bash
 python ocrolus_client.py list-books
@@ -56,27 +55,30 @@ python ocrolus_client.py book-status 12345
 
 ## Key Concepts
 
-**Book identifiers** — Ocrolus uses two IDs. Never mix them:
+**Book identifiers** — Ocrolus uses two IDs. v1 endpoints take the integer `pk`; v2 endpoints take the `uuid`. They are not interchangeable.
 
-| Identifier | Format | Used By |
-|-----------|--------|---------|
-| `book_pk` | Integer | v1 endpoints (upload, forms, transactions, status) |
-| `book_uuid` | UUID string | v2 endpoints (analytics, detect, income, classify) |
+| Identifier | Format | Used by |
+|------------|--------|---------|
+| `pk` | Integer | v1 endpoints (uploads, forms, transactions, status) |
+| `uuid` | UUID string | v2 endpoints (Classify, Detect, Analyze, Income) |
 
-**Processing modes:** Classify (fastest, classification only) → Instant (fast, good accuracy) → Complete (slowest, human review, highest accuracy)
+**Processing modes:** Classify (fastest, classification only) → Instant (fast, good accuracy) → Complete (slowest, human-verified, highest accuracy).
 
 ## Tools & Extras
 
 The `tools/` directory has optional utilities — see [`tools/README.md`](tools/README.md):
 
-- **Health check** — probe all API endpoints on your tenant
-- **Webhook setup** — listener + ngrok tunnel + auto-registration
-- **Widget quickstart** — Python/Flask implementation of the Ocrolus embeddable widget
-- **OpenAPI specs** — generated and official
+- **Health check** — probes API endpoints on your tenant.
+- **Webhook setup** — local listener + ngrok tunnel + auto-registration.
+- **Webhook verifier** — drop-in HMAC-SHA256 verification for production handlers.
+- **Widget quickstart** — Python/Flask implementation of the Ocrolus embeddable upload widget.
+- **OpenAPI spec** — `tools/docs/ocrolus-api-official-openapi3.yaml`.
+- **Postman collection** — `tools/docs/generated/ocrolus-api.postman_collection.json`.
+
 ## Ocrolus Documentation
 
-- [API Guide](https://docs.ocrolus.com/docs/guide)
 - [API Reference](https://docs.ocrolus.com/reference)
+- [API Guide](https://docs.ocrolus.com/docs/guide)
 - [Authentication](https://docs.ocrolus.com/docs/using-api-credentials)
 - [Webhooks](https://docs.ocrolus.com/docs/webhook-overview)
 - [Fraud Detection](https://docs.ocrolus.com/docs/detect)
