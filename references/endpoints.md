@@ -38,7 +38,7 @@ Create, update, delete, list, and look up books.
 
 ---
 
-## Document Upload
+## Document
 
 Upload documents, pay stubs, images, and Plaid data to a book.
 
@@ -59,13 +59,14 @@ The form field is `pk` (integer) or `book_uuid` (UUID) — not `book_pk`. Maximu
 | Endpoint | Method | Path | Input |
 |----------|--------|------|-------|
 | `document/cancel` | POST | `/v1/document/{doc_uuid}/cancel` | **Path:** `doc_uuid`; **Body (JSON, optional):** `doc_pk` OR `doc_uuid`, `accept_charges` (boolean) |
-| `document/remove` | POST | `/v1/document/{doc_uuid}/delete` | **Path:** `doc_uuid`; **Body (JSON):** `doc_id` (integer) OR `doc_uuid` |
+| `document/remove` | POST | `/v1/document/remove` | **Body (JSON):** exactly one of `doc_id` (integer) OR `doc_uuid` (UUID) |
 | `document/download` | GET | `/v1/document/{doc_uuid}/download` | **Path:** `doc_uuid`. Returns binary. |
 | `document/upgrade` | POST | `/v1/document/{doc_uuid}/upgrade` | **Path:** `doc_uuid`; **Body (JSON):** `doc_pk` OR `doc_uuid`, `upgrade_type` (string) |
+| `document/mixed/remove` | POST | `/v1/document/mixed/remove` | **Body (JSON):** exactly one of `pk` (integer) OR `doc_uuid` (UUID) |
 | `document/mixed/upgrade` | POST | `/v1/document/mixed/upgrade` | **Body (JSON):** `mixed_doc_pk` OR `mixed_doc_uuid`, `upgrade_type` |
 | `document/mixed/status` | GET | `/v1/document/mixed/status` | **Query:** one of `pk` (integer), `doc_uuid`, or `mixed_doc_uuid` |
 
-Field naming notes: `document/cancel` and `document/upgrade` use `doc_pk`; `document/remove` uses `doc_id`; `document/mixed/upgrade` uses `mixed_doc_pk`.
+Field naming notes: `document/cancel` and `document/upgrade` use `doc_pk`; `document/remove` uses `doc_id`; `document/mixed/upgrade` uses `mixed_doc_pk`; `document/mixed/remove` uses `pk`. See <https://docs.ocrolus.com/reference/delete-a-file>.
 
 ---
 

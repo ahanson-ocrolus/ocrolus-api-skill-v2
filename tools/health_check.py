@@ -38,8 +38,8 @@ ENDPOINTS = [
     ("Grant Token", "POST", AUTH_URL, "Authentication", None),
 
     # Book Operations
-    ("Create Book", "POST", "/v1/book/create", "Book Operations", None),
-    ("Delete Book", "POST", "/v1/book/delete", "Book Operations", None),
+    ("Create Book", "POST", "/v1/book/add", "Book Operations", None),
+    ("Delete Book", "POST", "/v1/book/remove", "Book Operations", None),
     ("Update Book", "POST", "/v1/book/update", "Book Operations", None),
     ("Get Book Info", "GET", "/v1/book/1", "Book Operations", None),
     ("List Books", "GET", "/v1/books", "Book Operations", None),
@@ -47,20 +47,21 @@ ENDPOINTS = [
     ("Book from Loan", "GET", "/v1/book/loan/test", "Book Operations", None),
     ("Loan from Book", "GET", "/v1/book/1/loan", "Book Operations", None),
 
-    # Document Upload & Management
-    ("Upload PDF", "POST", "/v1/book/upload", "Document Upload", None),
-    ("Upload Mixed PDF", "POST", "/v1/book/upload/mixed", "Document Upload", None),
-    ("Upload Pay Stub", "POST", "/v1/book/upload/paystub", "Document Upload", None),
-    ("Upload Image", "POST", "/v1/book/upload/image", "Document Upload", None),
-    ("Finalize Image Group", "POST", "/v1/book/finalize-image-group", "Document Upload", None),
-    ("Upload Plaid JSON", "POST", "/v1/book/upload/plaid", "Document Upload", None),
-    ("Import Plaid Asset", "POST", "/v1/book/import/plaid/asset", "Document Upload", None),
-    ("Cancel Document", "POST", "/v1/document/test-uuid/cancel", "Document Upload", None),
-    ("Delete Document", "POST", "/v1/document/test-uuid/delete", "Document Upload", None),
-    ("Download Document", "GET", "/v1/document/test-uuid/download", "Document Upload", None),
-    ("Upgrade Document", "POST", "/v1/document/test-uuid/upgrade", "Document Upload", None),
-    ("Upgrade Mixed Doc", "POST", "/v1/document/mixed/upgrade", "Document Upload", None),
-    ("Mixed Doc Status", "GET", "/v1/document/mixed/status", "Document Upload", None),
+    # Document
+    ("Upload PDF", "POST", "/v1/book/upload", "Document", None),
+    ("Upload Mixed PDF", "POST", "/v1/book/upload/mixed", "Document", None),
+    ("Upload Pay Stub", "POST", "/v1/book/upload/paystub", "Document", None),
+    ("Upload Image", "POST", "/v1/book/upload/image", "Document", None),
+    ("Finalize Image Group", "POST", "/v1/book/finalize-image-group", "Document", None),
+    ("Upload Plaid JSON", "POST", "/v1/book/upload/plaid", "Document", None),
+    ("Import Plaid Asset", "POST", "/v1/book/import/plaid/asset", "Document", None),
+    ("Cancel Document", "POST", "/v1/document/test-uuid/cancel", "Document", None),
+    ("Delete Document", "POST", "/v1/document/remove", "Document", None),
+    ("Download Document", "GET", "/v1/document/test-uuid/download", "Document", None),
+    ("Upgrade Document", "POST", "/v1/document/test-uuid/upgrade", "Document", None),
+    ("Upgrade Mixed Doc", "POST", "/v1/document/mixed/upgrade", "Document", None),
+    ("Delete Mixed Doc", "POST", "/v1/document/mixed/remove", "Document", None),
+    ("Mixed Doc Status", "GET", "/v1/document/mixed/status", "Document", None),
 
     # Classification (v2)
     ("Book Classification", "GET", "/v2/book/test-uuid/classification-summary", "Classification", None),

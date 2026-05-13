@@ -127,7 +127,7 @@
                 "add"
               ]
             },
-            "description": "CORRECTED from /v1/book/create. Returns pk (int) and uuid (str). Body: JSON.\n\n**Docs:** https://docs.ocrolus.com/reference/create-a-book",
+            "description": "Returns pk (integer) and uuid (string) for the new Book.\n\n**Docs:** https://docs.ocrolus.com/reference/create-a-book",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"My Book\",\n  \"book_type\": \"DEFAULT\"\n}",
@@ -165,10 +165,10 @@
                 "remove"
               ]
             },
-            "description": "Body: JSON. Exactly one of book_id (integer) or book_uuid (UUID string). Note: /v1/book/delete is an alias that also works.\n\n**Docs:** https://docs.ocrolus.com/reference/delete-a-book",
+            "description": "Body (JSON): exactly one of book_id (integer) or book_uuid (UUID string).\n\n**Docs:** https://docs.ocrolus.com/reference/delete-a-book",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"book_id\": \"71250194\",\n  \"book_uuid\": \"09c52985-2f05-4022-a738-9277cc335c7e\"\n}",
+              "raw": "{\n  \"book_uuid\": \"aaaa1111-bbbb-2222-cccc-333344445555\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -779,28 +779,59 @@
               }
             ],
             "url": {
-              "raw": "{{BASE_URL}}/v1/document/:doc_uuid/delete",
+              "raw": "{{BASE_URL}}/v1/document/remove",
               "host": [
                 "{{BASE_URL}}"
               ],
               "path": [
                 "v1",
                 "document",
-                ":doc_uuid",
-                "delete"
-              ],
-              "variable": [
-                {
-                  "key": "doc_uuid",
-                  "value": "aaaa1111-bbbb-2222-cccc-333344445555",
-                  "description": "Document UUID"
-                }
+                "remove"
               ]
             },
-            "description": "Path param: doc_uuid (UUID). Body (JSON): doc_id (integer) or doc_uuid (UUID). Official spec also supports query-param style: /v1/document/remove?doc_uuid=X\n\n**Docs:** https://docs.ocrolus.com/reference/delete-a-file",
+            "description": "Body (JSON): exactly one of doc_id (integer) or doc_uuid (UUID).\n\n**Docs:** https://docs.ocrolus.com/reference/delete-a-file",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"doc_id\": \"12345678\",\n  \"doc_uuid\": \"aaaa1111-bbbb-2222-cccc-333344445555\"\n}",
+              "raw": "{\n  \"doc_uuid\": \"aaaa1111-bbbb-2222-cccc-333344445555\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "document/mixed/remove \u2014 Delete a mixed document",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/v1/document/mixed/remove",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "document",
+                "mixed",
+                "remove"
+              ]
+            },
+            "description": "Body (JSON): exactly one of pk (integer) or doc_uuid (UUID).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"doc_uuid\": \"aaaa1111-bbbb-2222-cccc-333344445555\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

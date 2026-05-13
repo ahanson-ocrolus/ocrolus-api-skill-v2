@@ -122,7 +122,7 @@ Endpoints below mirror the structure at <https://docs.ocrolus.com/reference>. Pr
 | Book Status | `GET /v1/book/status?book_pk={pk}` | Path-style `/v1/book/{pk}/status` also works. |
 | Book ↔ Loan | `GET /v1/book/loan/{loan_id}` · `GET /v1/book/{pk}/loan` | |
 
-### Document Upload
+### Document
 
 | Operation | Method & Path | Notes |
 |-----------|---------------|-------|
@@ -133,7 +133,9 @@ Endpoints below mirror the structure at <https://docs.ocrolus.com/reference>. Pr
 | Finalize Image Group | `POST /v1/book/finalize-image-group` | Closes an image group so processing can start. |
 | Upload Plaid JSON | `POST /v1/book/upload/plaid` | |
 | Import Plaid Asset Report | `POST /v1/book/import/plaid/asset` | Production only. |
-| Cancel / Delete / Download | `POST /v1/document/{doc_uuid}/cancel` · `POST /v1/document/{doc_uuid}/delete` · `GET /v1/document/{doc_uuid}/download` | |
+| Cancel / Download | `POST /v1/document/{doc_uuid}/cancel` · `GET /v1/document/{doc_uuid}/download` | |
+| Delete Document | `POST /v1/document/remove` | Body: exactly one of `doc_id` (integer) or `doc_uuid` (UUID). ([docs](https://docs.ocrolus.com/reference/delete-a-file)) |
+| Delete Mixed Document | `POST /v1/document/mixed/remove` | Body: exactly one of `pk` (integer) or `doc_uuid` (UUID). |
 | Upgrade Document | `POST /v1/document/{doc_uuid}/upgrade` | Body: `upgrade_type`. Move a doc to a higher processing mode. |
 
 `form_type` is optional and cannot be used for bank statements.

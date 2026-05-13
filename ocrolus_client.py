@@ -45,7 +45,7 @@ class OcrolusClient:
     Endpoints are grouped by capability:
       - Authentication (automatic token management)
       - Book Operations (v1, book_pk)
-      - Document Upload & Management (v1, book_pk / doc_uuid)
+      - Document (v1, book_pk / doc_uuid)
       - Classification -- Classify (v2, book_uuid)
       - Data Extraction -- Capture (v1, book_pk)
       - Fraud Detection -- Detect (v2, book_uuid)
@@ -158,8 +158,7 @@ class OcrolusClient:
     def create_book(self, name: str, **kwargs) -> dict:
         """Create a new Book. Returns dict with 'pk' (int) and 'uuid' (str).
 
-        Note: The endpoint is /v1/book/add (NOT /v1/book/create which returns 404).
-        The 'book_type' parameter is not accepted; books default to 'DEFAULT' type.
+        See https://docs.ocrolus.com/reference/create-a-book
         """
         return self._post("/v1/book/add", json={"name": name, **kwargs})
 
@@ -179,9 +178,19 @@ class OcrolusClient:
         """Update Book properties."""
         return self._post("/v1/book/update", json={"book_pk": book_pk, **kwargs})
 
-    def delete_book(self, book_pk: int) -> dict:
-        """Delete a Book."""
-        return self._post("/v1/book/delete", json={"book_pk": book_pk})
+    def delete_book(
+        self,
+        book_id: Optional[int] = None,
+        book_uuid: Optional[str] = None,
+    ) -> dict:
+        """Delete a Book. Provide exactly one of book_id (integer pk) or book_uuid.
+
+        See https://docs.ocrolus.com/reference/delete-a-book
+        """
+        if (book_id is None) == (book_uuid is None):
+            raise ValueError("Provide exactly one of book_id or book_uuid")
+        body = {"book_id": book_id} if book_id is not None else {"book_uuid": book_uuid}
+        return self._post("/v1/book/remove", json=body)
 
     def get_book_from_loan(self, loan_id: str) -> dict:
         """Get Book associated with a loan ID."""
@@ -192,7 +201,7 @@ class OcrolusClient:
         return self._get(f"/v1/book/{book_pk}/loan")
 
     # =========================================================================
-    # DOCUMENT UPLOAD & MANAGEMENT (v1)
+    # DOCUMENT (v1)
     # =========================================================================
 
     def upload_pdf(self, book_pk: int, file: Union[str, Path, BinaryIO], form_type: Optional[str] = None) -> dict:
@@ -234,9 +243,34 @@ class OcrolusClient:
         """Cancel document verification."""
         return self._post(f"/v1/document/{doc_uuid}/cancel")
 
-    def delete_document(self, doc_uuid: str) -> dict:
-        """Delete a document."""
-        return self._post(f"/v1/document/{doc_uuid}/delete")
+    def delete_document(
+        self,
+        doc_uuid: Optional[str] = None,
+        doc_id: Optional[int] = None,
+    ) -> dict:
+        """Delete a document. Provide exactly one of doc_uuid or doc_id.
+
+        See https://docs.ocrolus.com/reference/delete-a-file
+        """
+        if (doc_uuid is None) == (doc_id is None):
+            raise ValueError("Provide exactly one of doc_uuid or doc_id")
+        body = {"doc_uuid": doc_uuid} if doc_uuid is not None else {"doc_id": doc_id}
+        return self._post("/v1/document/remove", json=body)
+
+    def delete_mixed_document(
+        self,
+        doc_uuid: Optional[str] = None,
+        pk: Optional[int] = None,
+    ) -> dict:
+        """Delete a mixed document. Provide exactly one of doc_uuid or pk.
+
+        The mixed/remove endpoint uses the field names `pk` and `doc_uuid`
+        (not `mixed_doc_pk` / `mixed_doc_uuid`).
+        """
+        if (doc_uuid is None) == (pk is None):
+            raise ValueError("Provide exactly one of doc_uuid or pk")
+        body = {"doc_uuid": doc_uuid} if doc_uuid is not None else {"pk": pk}
+        return self._post("/v1/document/mixed/remove", json=body)
 
     def download_document(self, doc_uuid: str) -> bytes:
         """Download a document file."""
